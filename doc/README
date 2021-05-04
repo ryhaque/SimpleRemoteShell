@@ -1,0 +1,22 @@
+Name: Ryanul Haque
+Student ID: ryhaque
+
+This is a README file. The files for submission are.
+
+In src directory
+1. myclient.c - This is program for sending unix commands to a remote shell (server) and receiving the response and display to stdout.
+2. myserver.c - This recives the client unix command and processes it and then responds.
+3. Makefile - This is used for compiling the program using the command make.
+
+In doc directory
+4. README - Contains Name, student ID and files for submission with brief description
+5. DESIGN - Contains the documentation and design for the entire program. 
+
+In bin
+6. myclient.o - The binary object file for myclient.c
+7. myclient - The binary executable file for myclient.c 
+8. myserver.o - The binary object file for myserver.c
+9. myserver - The binary executable file for myserver.c
+10. file1 and file2 - Small test files for testing 
+11. testfile - large textfile for testing 
+12. emptyfile - file for testing 

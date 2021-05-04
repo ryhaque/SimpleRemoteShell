@@ -1,0 +1,156 @@
+                    LAB 3 DESIGN DOCUMENT: SIMPLE REMOTE SHELL 
+Goal:
+The purpose of this assignment is to design a remote shell using the Client server model. The client sends Unix 
+shell commands to the server and the server processes these commands and responds back to the client. The client
+displays the responses to stdout.
+
+Design
+Functions and design description of Client design
+
+int main():
+I first parse through the command line arguments. If argc is not 3 then the arguments are invalid. I get the 
+ip address and port number by reading argv[1] and argv[2] respectively. Next I create the socket and configure 
+the socket address. Then I connect() to the server using the socket descriptor.
+
+Once the connection is established, I continuously readline() from the client command line terminal. If 'exit' 
+is read then break out of client loop. Otherwise, I generate the command by appending the "2>&1" string to the 
+command (to be able to display stderr data as well). Then I send the Unix command to the server to process the 
+command.
+
+Once the server processes and responds, I read() the data coming in on the server socket, while the amount of 
+bytes read() is the same as the buffer size. The data read() is then written() to stdout. If the last character
+of the receive buffer contains the terminating character then I exclude that character when I write() to stdout.
+
+Note: The server sends 1 less than the buffersize of data and the terminating/continuing character to account 
+for terminating characters. So after the client reads it writes 1 less than what it read for the actual data.
+
+
+Pseudo code for client receiving data at the client:
+while true
+    readline() and parse command 
+    send() command 
+    while (sz == buffersize)
+        sz = read() data into recvline 
+        write() data of sz-1 to stdout //remove the continuation character 
+        
+        if recvline[sz-1] contains the terminating character 
+            write() sz-2 of data to stdout if sz>1 (2 terminating characters for remaining bytes and trasnfer complete indication)
+            else write() sz-1 to remove terminating character 
+
+        
+Functions and description of Server design
+
+int main():
+First I parse through the command line arguments ensuring that argc is 2. I get the port number if that is the case.
+Next I create the socket, configure the socket. Bind() the address and then listen() for incoming connections.
+Then I continuously keep accepting() connections to get the client socket descriptor. Then in a forever while loop 
+I read from the socket to get the command. Then I process the command request and respond accordingly. I have a 
+function called process_response() to handle that.
+
+void process_response():
+This function is responsible for trasnfering data. It takes the comm_fd, the command and a server response structure
+as the arguments. First I popen() the command for reading. (This creates a pipe for the program and it runs the 
+and retunrs the data back through the pipe.) After that, I use the FILE* returned from popen() to read() the output
+of the command into the data. I use fread() for achieving this. Note I read 1 less than buffersize into the data.
+This is for adding the extra terminating or continuing character. It works like a flag. if the chars read is 
+0 or less than buffersize-1; meaning if it's at the end or if there's remaining bytes to send but buffer reached 
+send the + character. Otherwise, if chars_read is not 0 keep sending data with continuing character.
+
+Note: simply it is just a + or - at the end to indicate the type of trasnfer. 
+
+Data Structures or global variables:
+
+struct server_response{
+	char data[BUFFERSIZE];
+};
+
+This is a global variable that has the data to send to client.
+
+Pseudo code for server:
+int main(): 
+    if argc is not 2 invalid args. else get the port from argv[1].
+    create socket(), configure, bind(), listen()
+    while(true)
+        accept() client connections 
+        while(true)
+            read() command 
+            process_response()
+
+void process_response():
+    popen() return the file pointer pf.
+    
+    while(char_read>0)
+        chars_read = fread() buffersize-1 bytes of data.
+        if chars_read = 0 or char_read < buffersize-1 //there's remaining bytes inclue '+' character with data 
+            append the + character to data 
+            write() data and + characters  to comm_fd //i.e. send to client 
+        
+        else write() data + continuation character '-'
+
+
+
+Testing (How to use): 
+In order to test I open 2 terminals on the bin directory. 
+In order to run the client terminal type: ./myclient [ipaddr] [port]
+In order to run the server terminal type: ./myserver [port]
+
+If the arguments for argc is not the expected value an error is thrown.
+
+Test short Unix commands:
+ran commands for uname, ls, date, du, echo <small message>, cat [smallfile], cat /etc/resolv.config, tty,
+uptime,
+results behaved as expected 
+
+Test long Unix commands:
+ran commands like set, cat longfile.txt (textfile), df -h
+results behaved as expected.
+
+Tested edge cases such as:
+    where data is same size as buffer,
+    data is smaller than buffer,
+    data is larger than buffer,
+    data is a multiple of buffer or data size evenly divides by buffer size 
+    data is same size as buffer 
+
+All cases behaved as expected.
+
+Tested all the commands as listen on lab pdf document:
+    cat /etc/resolv.conf
+    cat <filename>
+    date
+    df -h
+    du
+    echo $PATH
+    echo <environment variable>
+    free
+    last
+    ps aux
+    pwd
+    set
+    tty
+    uname -a
+    uptime
+    who
+
+    exit
+
+Results: Behaved as expected. Note special command 'exit' breaks out of client loop and I am able to connect 
+again without server crashing.
+
+
+Limitations or problems:
+
+The command line does not take in a command larger than 1024. Beyond that the command breaks.
+I had limitations with sending data in previous design implementations (buffer multiples) but data trasnfer are FIXED.
+
+One important limitation that my program has is that the server is not concurrent. No concurrency such as fork()
+implemented. This is the most recent working program. Due to Race conditions and timing constraint concurrency
+was not implemnted in an effort to maximise the points.
+
+Another limitation that I noticed while testing was running just the 'cat' command hangs the server and client.
+I have to exit out of the server to get back the response in this case. And I have to rerun client as well.
+Testing for this limitation was not mentioned in the lab prompt or in discussion. But I am making a note of it.
+
+Citations:
+The code for both client and server was initially based on echocli and echosrv models which are shared in 
+reference materials. Also used the popen() example shared in discussion.
