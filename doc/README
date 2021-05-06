@@ -1,7 +1,6 @@
 Name: Ryanul Haque
-Student ID: ryhaque
 
-This is a README file. The files for submission are.
+This is a README file.
 
 In src directory
 1. myclient.c - This is program for sending unix commands to a remote shell (server) and receiving the response and display to stdout.

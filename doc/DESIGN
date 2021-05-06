@@ -1,4 +1,5 @@
-                    LAB 3 DESIGN DOCUMENT: SIMPLE REMOTE SHELL 
+                    DESIGN DOCUMENT: SIMPLE REMOTE SHELL 
+
 Goal:
 The purpose of this assignment is to design a remote shell using the Client server model. The client sends Unix 
 shell commands to the server and the server processes these commands and responds back to the client. The client

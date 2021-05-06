@@ -1,8 +1,8 @@
 #-----------------------------------------------
-#Ryanul Haque
-#ryhaque
-#CSE156/L
-#Makefile using Macros
+# Ryanul Haque
+# ryhaque
+# CSE156/L
+# Makefile using Macros
 #------------------------------------------------
 
 CC = gcc

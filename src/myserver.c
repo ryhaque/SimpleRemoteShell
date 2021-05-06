@@ -1,4 +1,5 @@
-/*  This is the server side of the code.
+/*  
+    This is the server side of the code.
     The server receives client commands, processes it by popen() and reading it.
     The server than responds accordingly.
 */

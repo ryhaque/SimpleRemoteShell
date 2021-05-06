@@ -1,4 +1,5 @@
-/*  This is the client side of the program.
+/*  
+    This is the client side of the program.
     The client readline() from stdin, and then generates a unix command to send to server
     The client that receives the server response accordingly and displays it to stdout.
 */
